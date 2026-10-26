@@ -1,0 +1,7 @@
+---
+
+# Lab credentials come from the role defaults.
+# Ideally done on an ansible-vault file.
+# pulp_setup_admin_password:
+# pulp_setup_db_password:
+# pulp_setup_secret_key:

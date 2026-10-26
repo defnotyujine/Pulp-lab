@@ -1,0 +1,38 @@
+---
+
+- name: Write the Pulp quadlet units
+  ansible.builtin.template:
+    src: "quadlet/{{ item.src }}"
+    dest: "/etc/containers/systemd/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0600"
+  loop:
+    - {src: pulp.network.j2, dest: pulp.network}
+    - {src: pulp-postgres.container.j2, dest: pulp-postgres.container}
+    - {src: pulp-redis.container.j2, dest: pulp-redis.container}
+    - {src: pulp-migrate.container.j2, dest: pulp-migrate.container}
+    - {src: pulp-core.container.j2, dest: pulp-api.container, svc: api}
+    - {src: pulp-core.container.j2, dest: pulp-content.container, svc: content}
+    - {src: pulp-core.container.j2, dest: pulp-worker.container, svc: worker}
+    - {src: pulp-web.container.j2, dest: pulp-web.container}
+  notify:
+    - Reload systemd
+    - Restart pulp
+
+- name: Apply unit and config changes now
+  ansible.builtin.meta: flush_handlers
+
+- name: Start the Pulp services
+  ansible.builtin.systemd_service:
+    name: "{{ item }}.service"
+    state: started
+  loop: "{{ pulp_setup_services }}"
+
+- name: Wait for the Pulp API
+  ansible.builtin.uri:
+    url: "http://localhost:{{ pulp_setup_web_port }}/pulp/api/v3/status/"
+  register: pulp_setup_api_check
+  until: pulp_setup_api_check.status == 200
+  retries: 30
+  delay: 10

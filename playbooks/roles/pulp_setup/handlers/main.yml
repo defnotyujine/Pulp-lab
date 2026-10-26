@@ -1,0 +1,11 @@
+---
+# handlers file for pulp_setup
+- name: Reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Restart pulp
+  ansible.builtin.systemd_service:
+    name: "{{ item }}.service"
+    state: restarted
+  loop: "{{ pulp_setup_services }}"

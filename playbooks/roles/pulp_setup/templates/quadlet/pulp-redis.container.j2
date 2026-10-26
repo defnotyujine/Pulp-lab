@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Pulp Redis (cache)
+
+[Container]
+Image={{ pulp_setup_redis_image }}
+ContainerName=pulp-redis
+Network=pulp.network
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target

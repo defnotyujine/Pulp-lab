@@ -1,0 +1,24 @@
+# {{ ansible_managed }}
+# Pulp settings, mounted into the api, content, worker and migrate containers
+# as /etc/pulp/settings.py. Sets the client URL, PostgreSQL and Redis.
+SECRET_KEY = {{ pulp_setup_secret_key | to_json }}
+CONTENT_ORIGIN = {{ pulp_setup_url | to_json }}
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": "pulp-postgres",
+        "PORT": 5432,
+        "NAME": "pulp",
+        "USER": "pulp",
+        "PASSWORD": {{ pulp_setup_db_password | to_json }},
+    }
+}
+
+CACHE_ENABLED = True
+REDIS_HOST = "pulp-redis"
+REDIS_PORT = 6379
+
+TOKEN_AUTH_DISABLED = True
+ANALYTICS = False
+STATIC_ROOT = "/var/lib/operator/static/"

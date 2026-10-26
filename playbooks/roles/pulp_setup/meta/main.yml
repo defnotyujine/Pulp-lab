@@ -1,0 +1,18 @@
+---
+
+galaxy_info:
+  author: Eugene Garces
+  description: Deploys a Pulp server on RHEL as Podman quadlets (api, content, worker, web, PostgreSQL, Redis)
+  license: MIT
+  min_ansible_version: "2.16.1"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+        - "10"
+  galaxy_tags:
+    - pulp
+    - podman
+    - quadlet
+    - repository
+dependencies: []

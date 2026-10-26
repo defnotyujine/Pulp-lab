@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+# Runs the DB migrations once, then stays "active". The api, content and worker
+# units Require= this one, so they never start on an unmigrated database.
+[Unit]
+Description=Pulp database migrations
+Requires=pulp-postgres.service
+After=pulp-postgres.service
+
+[Container]
+Image={{ pulp_setup_image }}
+ContainerName=pulp-migrate
+Network=pulp.network
+User={{ pulp_setup_uid }}
+Group={{ pulp_setup_uid }}
+Volume=/etc/pulp/settings.py:/etc/pulp/settings.py:ro,z
+Volume=/etc/pulp/certs:/etc/pulp/certs:ro,z
+Volume=pulp-storage:/var/lib/pulp
+Exec=pulpcore-manager migrate --noinput
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes

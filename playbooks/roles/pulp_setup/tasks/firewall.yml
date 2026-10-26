@@ -1,0 +1,14 @@
+---
+
+- name: Permit Pulp traffic on firewall
+  ansible.builtin.include_role:
+    name: redhat.rhel_system_roles.firewall
+    apply:
+      tags: pulp_firewall
+  vars:
+    firewall:
+      port:
+        - "{{ pulp_web_port }}/tcp"
+      permanent: true
+      runtime: true
+      state: enabled

@@ -1,2 +1,24 @@
 ---
-# defaults file for pulp_setup
+
+# Images
+# Pinned so every run deploys the same Pulp version, avoid "stable" and "latest"
+pulp_image_tag: "3.123.1"
+pulp_image: "quay.io/pulp/pulp-minimal:{{ pulp_image_tag }}"
+pulp_web_image: "quay.io/pulp/pulp-web:{{ pulp_image_tag }}"
+pulp_postgres_image: "docker.io/library/postgres:16"
+pulp_redis_image: "docker.io/library/redis:7"
+
+# Network
+pulp_web_port: 8080                       # pulp-web port, opened in firewalld
+
+# URL clients use to reach Pulp, written into generated repo files
+pulp_url: "http://{{ ansible_host | default(inventory_hostname) }}:{{ pulp_web_port }}"
+
+# Pulp user
+pulp_uid: 700                             # UID/GID of pulp-minimal, must be able to read settings.py and the key
+
+# Credentials
+# Lab values. Recommended to override these from an Ansible Vault
+pulp_admin_password: "changeme"               # Pulp API login for user admin (pulp-cli, curl, content plays)
+pulp_db_password: "pulp"                      # Password to PostgreSQL connection
+pulp_secret_key: "lab-secret-key-change-me"   # Django

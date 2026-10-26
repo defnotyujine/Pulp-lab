@@ -1,0 +1,25 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Pulp PostgreSQL
+
+[Container]
+Image={{ pulp_postgres_image }}
+ContainerName=pulp-postgres
+Network=pulp.network
+Volume=pulp-pgdata:/var/lib/postgresql/data
+# Only used the first time the data volume is created.
+Environment=POSTGRES_USER=pulp
+Environment=POSTGRES_PASSWORD={{ pulp_db_password }}
+Environment=POSTGRES_DB=pulp
+# Don't report "started" until the DB accepts connections, so migrations don't run too early.
+HealthCmd=pg_isready -U pulp
+HealthInterval=5s
+Notify=healthy
+
+[Service]
+Restart=always
+# Room for the first image pull.
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target

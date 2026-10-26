@@ -1,2 +1,12 @@
 ---
 # vars file for pulp_setup
+
+# All services
+pulp_services:
+  - pulp-postgres
+  - pulp-redis
+  - pulp-migrate
+  - pulp-api
+  - pulp-content
+  - pulp-worker
+  - pulp-web

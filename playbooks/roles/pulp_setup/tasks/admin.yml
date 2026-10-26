@@ -1,0 +1,19 @@
+---
+
+# Only reset the password when the current one doesn't work, so re-runs stay changed=0.
+- name: Check the admin password
+  ansible.builtin.uri:
+    url: "http://localhost:{{ pulp_web_port }}/pulp/api/v3/users/?username=admin"
+    user: admin
+    password: "{{ pulp_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 401]
+  register: pulp_admin_auth
+  no_log: true
+
+- name: Set the admin password
+  ansible.builtin.command:
+    argv: [podman, exec, pulp-api, pulpcore-manager, reset-admin-password, --password, "{{ pulp_admin_password }}"]
+  when: pulp_admin_auth.status == 401
+  changed_when: true
+  no_log: true

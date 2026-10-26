@@ -1,0 +1,26 @@
+# {{ ansible_managed }}
+# Used for pulp-api, pulp-content and pulp-worker. Same image, different command.
+[Unit]
+Description=Pulp {{ item.svc }}
+Requires=pulp-postgres.service pulp-redis.service pulp-migrate.service
+After=pulp-postgres.service pulp-redis.service pulp-migrate.service
+
+[Container]
+Image={{ pulp_image }}
+ContainerName=pulp-{{ item.svc }}
+Network=pulp.network
+# nginx.conf.template sends requests to "pulp_api" and "pulp_content".
+NetworkAlias=pulp_{{ item.svc }}
+User={{ pulp_uid }}
+Group={{ pulp_uid }}
+Volume=/etc/pulp/settings.py:/etc/pulp/settings.py:ro,z
+Volume=/etc/pulp/certs:/etc/pulp/certs:ro,z
+Volume=pulp-storage:/var/lib/pulp
+Exec=pulp-{{ item.svc }}
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target

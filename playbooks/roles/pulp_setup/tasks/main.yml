@@ -1,2 +1,46 @@
 ---
-# tasks file for pulp_setup
+
+- name: Run Preliminaries and Data Validation
+  ansible.builtin.import_tasks:
+    file: prelim.yml
+  tags: always
+
+- name: Install Pulp packages
+  ansible.builtin.import_tasks:
+    file: packages.yml
+  tags: pulp_packages
+
+- name: Configure Pulp settings and files
+  ansible.builtin.import_tasks:
+    file: config.yml
+  tags: pulp_config
+
+- name: Deploy Pulp containers
+  ansible.builtin.import_tasks:
+    file: containers.yml
+  tags: pulp_containers
+
+- name: Configure Pulp firewall
+  ansible.builtin.import_tasks:
+    file: firewall.yml
+  tags: pulp_firewall
+
+- name: Configure Pulp admin user
+  ansible.builtin.import_tasks:
+    file: admin.yml
+  tags: pulp_admin
+
+- name: Validate Pulp installation
+  ansible.builtin.uri:
+    url: "http://localhost:{{ pulp_web_port }}/pulp/api/v3/status/"
+  register: pulp_status
+  tags: always
+
+- name: Display validation output
+  ansible.builtin.debug:
+    msg:
+      url: "{{ pulp_url }}"
+      database: "{{ pulp_status.json.database_connection.connected }}"
+      redis: "{{ pulp_status.json.redis_connection.connected }}"
+      workers: "{{ pulp_status.json.online_workers | map(attribute='name') | list }}"
+  tags: always

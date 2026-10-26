@@ -1,0 +1,24 @@
+# {{ ansible_managed }}
+# nginx in front of the API and content app.
+[Unit]
+Description=Pulp web (nginx)
+Wants=pulp-api.service pulp-content.service
+After=pulp-api.service pulp-content.service
+
+[Container]
+Image={{ pulp_web_image }}
+ContainerName=pulp-web
+Network=pulp.network
+# nginx.sh rewrites files under /etc/nginx, so this one runs as root.
+User=0
+PublishPort={{ pulp_web_port }}:8080
+Volume=/etc/pulp/nginx/nginx.sh:/usr/bin/nginx.sh:ro,z
+Volume=/etc/pulp/nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:ro,z
+Exec=/usr/bin/nginx.sh
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target

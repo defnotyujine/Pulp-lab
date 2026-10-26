@@ -1,0 +1,11 @@
+---
+
+# The quadlets need Podman 5.2+ (NetworkAlias=), which RHEL ships from 9.5 on.
+- name: Check OS is RHEL 9.5+ or RHEL 10
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == 'RedHat'
+      - ansible_distribution_major_version in ['9', '10']
+      - ansible_distribution_version is version('9.5', '>=')
+    success_msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is the detected operating system."
+    fail_msg: "This role supports RHEL 9.5+ and RHEL 10 only, detected {{ ansible_distribution }} {{ ansible_distribution_version }}."

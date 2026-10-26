@@ -1,0 +1,50 @@
+---
+
+- name: Create Pulp config directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.owner }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: /etc/pulp, owner: "0", mode: "0755"}
+    - {path: /etc/pulp/certs, owner: "{{ pulp_uid }}", mode: "0700"}
+    - {path: /etc/pulp/nginx, owner: "0", mode: "0755"}
+
+- name: Write settings.py
+  ansible.builtin.template:
+    src: settings.py.j2
+    dest: /etc/pulp/settings.py
+    owner: root
+    group: "{{ pulp_uid }}"
+    mode: "0640"
+  notify: Restart pulp
+
+# Pulp encrypts secrets in the DB with this key. Generated once only.
+- name: Generate the DB encryption key (first run only)
+  ansible.builtin.shell: |
+    set -o pipefail
+    umask 077
+    openssl rand -base64 32 | tr '+/' '-_' > /etc/pulp/certs/database_fields.symmetric.key
+  args:
+    creates: /etc/pulp/certs/database_fields.symmetric.key
+
+- name: Make the encryption key readable by the pulp user
+  ansible.builtin.file:
+    path: /etc/pulp/certs/database_fields.symmetric.key
+    owner: "{{ pulp_uid }}"
+    group: "{{ pulp_uid }}"
+    mode: "0600"
+
+- name: Copy the nginx template and start script for pulp-web
+  ansible.builtin.copy:
+    src: "{{ item.name }}"
+    dest: "/etc/pulp/nginx/{{ item.name }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  loop:
+    - {name: nginx.conf.template, mode: "0644"}
+    - {name: nginx.sh, mode: "0755"}
+  notify: Restart pulp

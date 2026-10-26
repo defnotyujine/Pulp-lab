@@ -1,0 +1,7 @@
+---
+
+- name: Setup the Pulp Server
+  hosts: all
+  become: true
+  roles:
+    - role: "{{ playbook_dir }}"

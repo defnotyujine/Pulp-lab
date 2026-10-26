@@ -24,9 +24,9 @@
 # Pulp encrypts secrets in the DB with this key. Generated once only.
 - name: Generate the DB encryption key (first run only)
   ansible.builtin.shell: |
-    set -eo pipefail
+    set -e
     umask 077
-    openssl rand -base64 32 | tr '+/' '-_' > /etc/pulp/certs/key.tmp
+    openssl rand -base64 32 > /etc/pulp/certs/key.tmp
     mv /etc/pulp/certs/key.tmp /etc/pulp/certs/database_fields.symmetric.key
   args:
     creates: /etc/pulp/certs/database_fields.symmetric.key

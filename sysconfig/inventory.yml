@@ -1,0 +1,5 @@
+pulp_servers:
+  hosts:
+    pulp_server1:
+      ansible_host: 10.16.96.232
+      ansible_user: "frqadmin"

@@ -1,0 +1,35 @@
+---
+
+# Play 1: Pre-checks
+- hosts: all
+  gather_facts: true
+
+  pre_tasks:
+    - name: Check ansible version is greater than 2.16.1
+      ansible.builtin.fail:
+        msg: >-
+          Unsupported ansible-core version: {{ ansible_version.full }}.
+          This playbook requires ansible-core 2.16.1 or higher.
+      when: not (ansible_version.full is version('2.16.1', '>='))
+      tags: always
+
+    - name: Ensure the system is supported
+      ansible.builtin.fail:
+        msg: >-
+          Unsupported OS: {{ ansible_distribution }}
+          {{ ansible_distribution_major_version }}.
+          This playbook supports RHEL and AlmaLinux versions 9 and 10 only.
+      when: >
+        not (
+          ansible_os_family == "RedHat" and
+          ansible_distribution in ["RedHat", "AlmaLinux"] and
+          ansible_distribution_major_version in ["9", "10"]
+        )
+      tags: always
+
+# Play 2: Pulp server setup
+- name: Deploy the Pulp server
+  hosts: pulp_servers
+  become: true
+  roles:
+    - pulp_setup

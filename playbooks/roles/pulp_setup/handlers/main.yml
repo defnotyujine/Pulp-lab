@@ -8,4 +8,4 @@
   ansible.builtin.systemd_service:
     name: "{{ item }}.service"
     state: restarted
-  loop: "{{ pulp_services }}"
+  loop: "{{ pulp_setup_services }}"

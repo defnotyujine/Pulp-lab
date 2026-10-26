@@ -1,7 +1,8 @@
 ---
 
 # Play 1: Pre-checks
-- hosts: all
+- name: Run pre-checks
+  hosts: all
   gather_facts: true
 
   pre_tasks:

@@ -32,15 +32,15 @@
 
 - name: Validate Pulp installation
   ansible.builtin.uri:
-    url: "http://localhost:{{ pulp_web_port }}/pulp/api/v3/status/"
-  register: pulp_status
+    url: "http://localhost:{{ pulp_setup_web_port }}/pulp/api/v3/status/"
+  register: pulp_setup_status
   tags: always
 
 - name: Display validation output
   ansible.builtin.debug:
     msg:
-      url: "{{ pulp_url }}"
-      database: "{{ pulp_status.json.database_connection.connected }}"
-      redis: "{{ pulp_status.json.redis_connection.connected }}"
-      workers: "{{ pulp_status.json.online_workers | map(attribute='name') | list }}"
+      url: "{{ pulp_setup_url }}"
+      database: "{{ pulp_setup_status.json.database_connection.connected }}"
+      redis: "{{ pulp_setup_status.json.redis_connection.connected }}"
+      workers: "{{ pulp_setup_status.json.online_workers | map(attribute='name') | list }}"
   tags: always

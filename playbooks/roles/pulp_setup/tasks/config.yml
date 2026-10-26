@@ -9,7 +9,7 @@
     mode: "{{ item.mode }}"
   loop:
     - {path: /etc/pulp, owner: "0", mode: "0755"}
-    - {path: /etc/pulp/certs, owner: "{{ pulp_uid }}", mode: "0700"}
+    - {path: /etc/pulp/certs, owner: "{{ pulp_setup_uid }}", mode: "0700"}
     - {path: /etc/pulp/nginx, owner: "0", mode: "0755"}
 
 - name: Write settings.py
@@ -17,7 +17,7 @@
     src: settings.py.j2
     dest: /etc/pulp/settings.py
     owner: root
-    group: "{{ pulp_uid }}"
+    group: "{{ pulp_setup_uid }}"
     mode: "0640"
   notify: Restart pulp
 
@@ -34,8 +34,8 @@
 - name: Make the encryption key readable by the pulp user
   ansible.builtin.file:
     path: /etc/pulp/certs/database_fields.symmetric.key
-    owner: "{{ pulp_uid }}"
-    group: "{{ pulp_uid }}"
+    owner: "{{ pulp_setup_uid }}"
+    group: "{{ pulp_setup_uid }}"
     mode: "0600"
 
 - name: Copy the nginx template and start script for pulp-web

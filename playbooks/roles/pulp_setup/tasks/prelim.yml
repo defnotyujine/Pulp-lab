@@ -1,6 +1,6 @@
 ---
 
-# The quadlets need Podman 5.2+ (NetworkAlias=), which RHEL ships from 9.5 on.
+# The quadlets need Podman 5.2+, which RHEL ships from 9.5 on.
 - name: Check OS is RHEL 9.5+ or RHEL 10
   ansible.builtin.assert:
     that:

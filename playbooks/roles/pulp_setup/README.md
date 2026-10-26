@@ -18,24 +18,24 @@ This role deploys a Pulp server on RHEL using Podman quadlets. Each Pulp compone
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `pulp_image_tag` | string | `"3.123.1"` | Pulp version for `pulp-minimal` and `pulp-web`. Bump it and re-run to upgrade. |
-| `pulp_postgres_image` | string | `"docker.io/library/postgres:16"` | PostgreSQL image. |
-| `pulp_redis_image` | string | `"docker.io/library/redis:7"` | Redis image. |
+| `pulp_setup_image_tag` | string | `"3.123.1"` | Pulp version for `pulp-minimal` and `pulp-web`. Bump it and re-run to upgrade. |
+| `pulp_setup_postgres_image` | string | `"docker.io/library/postgres:16"` | PostgreSQL image. |
+| `pulp_setup_redis_image` | string | `"docker.io/library/redis:7"` | Redis image. |
 
 ### Network
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `pulp_web_port` | int | `8080` | Port pulp-web listens on, opened in firewalld. |
-| `pulp_url` | string | `http://<ansible_host>:8080` | URL clients use to reach Pulp. |
+| `pulp_setup_web_port` | int | `8080` | Port pulp-web listens on, opened in firewalld. |
+| `pulp_setup_url` | string | `http://<ansible_host>:8080` | URL clients use to reach Pulp. |
 
 ### Credentials
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `pulp_admin_password` | string | `"changeme"` | Password of the Pulp `admin` user. |
-| `pulp_db_password` | string | `"pulp"` | PostgreSQL password. Letters and digits only. |
-| `pulp_secret_key` | string | `"lab-secret-key-change-me"` | Django `SECRET_KEY`. |
+| `pulp_setup_admin_password` | string | `"changeme"` | Password of the Pulp `admin` user. |
+| `pulp_setup_db_password` | string | `"pulp"` | PostgreSQL password. Letters and digits only. |
+| `pulp_setup_secret_key` | string | `"lab-secret-key-change-me"` | Django `SECRET_KEY`. |
 
 > **Note:** The defaults are lab values. Outside a lab, override them from an Ansible Vault.
 
@@ -48,7 +48,7 @@ This role deploys a Pulp server on RHEL using Podman quadlets. Each Pulp compone
 | `pulp_packages` | Install Podman |
 | `pulp_config` | `settings.py`, DB encryption key, nginx files |
 | `pulp_containers` | Quadlet units, start services |
-| `pulp_firewall` | Open `pulp_web_port` |
+| `pulp_firewall` | Open `pulp_setup_web_port` |
 | `pulp_admin` | Set the admin password |
 
 ---

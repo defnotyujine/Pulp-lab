@@ -7,11 +7,11 @@ Requires=pulp-postgres.service
 After=pulp-postgres.service
 
 [Container]
-Image={{ pulp_image }}
+Image={{ pulp_setup_image }}
 ContainerName=pulp-migrate
 Network=pulp.network
-User={{ pulp_uid }}
-Group={{ pulp_uid }}
+User={{ pulp_setup_uid }}
+Group={{ pulp_setup_uid }}
 Volume=/etc/pulp/settings.py:/etc/pulp/settings.py:ro,z
 Volume=/etc/pulp/certs:/etc/pulp/certs:ro,z
 Volume=pulp-storage:/var/lib/pulp

@@ -8,7 +8,7 @@
   vars:
     firewall:
       port:
-        - "{{ pulp_web_port }}/tcp"
+        - "{{ pulp_setup_web_port }}/tcp"
       permanent: true
       runtime: true
       state: enabled

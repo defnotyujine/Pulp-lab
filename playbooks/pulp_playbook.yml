@@ -13,19 +13,14 @@
       when: not (ansible_version.full is version('2.16.1', '>='))
       tags: always
 
-    - name: Ensure the system is supported
-      ansible.builtin.fail:
-        msg: >-
-          Unsupported OS: {{ ansible_distribution }}
-          {{ ansible_distribution_major_version }}.
-          This playbook supports RHEL and AlmaLinux versions 9 and 10 only.
-      when: >
-        not (
-          ansible_os_family == "RedHat" and
-          ansible_distribution in ["RedHat", "AlmaLinux"] and
-          ansible_distribution_major_version in ["9", "10"]
-        )
-      tags: always
+    - name: Check OS is RHEL 9.5+ or RHEL 10
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == 'RedHat'
+          - ansible_distribution_major_version in ['9', '10']
+          - ansible_distribution_version is version('9.5', '>=')
+        success_msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is the detected operating system."
+        fail_msg: "This role supports RHEL 9.5+ and RHEL 10 only, detected {{ ansible_distribution }} {{ ansible_distribution_version }}."
 
 # Play 2: Pulp server setup
 - name: Deploy the Pulp server

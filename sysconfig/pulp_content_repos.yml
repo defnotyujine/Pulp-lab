@@ -1,0 +1,13 @@
+---
+
+# RPM repositories managed in Pulp
+# Each channel is a distribution. Without "version" it follows every sync,
+# with "version" it stays on that repository version (bump it to promote).
+pulp_content_repos_rpm:
+  - name: wazuh-4
+    url: https://packages.wazuh.com/4.x/yum/
+    # retain_package_versions: 2              # keep only the newest 2 versions of each package
+    channels:
+      - base_path: wazuh/4/latest
+      - base_path: wazuh/4/approved
+        version: 1

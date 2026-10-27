@@ -1,0 +1,56 @@
+---
+
+- name: Create RPM remote {{ pulp_content_repos_repo.name }}
+  pulp.squeezer.rpm_remote:
+    name: "{{ pulp_content_repos_repo.name }}"
+    url: "{{ pulp_content_repos_repo.url }}"
+    policy: "{{ pulp_content_repos_repo.policy | default('on_demand') }}"
+    state: present
+
+# autopublish creates the yum metadata for every new version.
+- name: Create RPM repository {{ pulp_content_repos_repo.name }}
+  pulp.squeezer.rpm_repository:
+    name: "{{ pulp_content_repos_repo.name }}"
+    remote: "{{ pulp_content_repos_repo.name }}"
+    autopublish: true
+    retain_package_versions: "{{ pulp_content_repos_repo.retain_package_versions | default(omit) }}"
+    state: present
+
+# Only reports changed when upstream changed and a new version was created.
+- name: Sync RPM repository {{ pulp_content_repos_repo.name }}
+  pulp.squeezer.rpm_sync:
+    repository: "{{ pulp_content_repos_repo.name }}"
+    sync_policy: "{{ pulp_content_repos_repo.sync_policy | default('additive') }}"
+
+- name: Distribute the latest version {{ pulp_content_repos_repo.name }}
+  pulp.squeezer.rpm_distribution:
+    name: "{{ item.base_path | replace('/', '-') }}"
+    base_path: "{{ item.base_path }}"
+    repository: "{{ pulp_content_repos_repo.name }}"
+    generate_repo_config: true
+    state: present
+  loop: "{{ pulp_content_repos_repo.channels | rejectattr('version', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.base_path }}"
+
+- name: Find the publication of each pinned version {{ pulp_content_repos_repo.name }}
+  pulp.squeezer.rpm_publication:
+    repository: "{{ pulp_content_repos_repo.name }}"
+    version: "{{ item.version }}"
+    state: present
+  loop: "{{ pulp_content_repos_repo.channels | selectattr('version', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.base_path }} -> version {{ item.version }}"
+  register: pulp_content_repos_pinned
+
+# Changing a channel's version and re-running is promotion (or rollback).
+- name: Distribute the pinned versions {{ pulp_content_repos_repo.name }}
+  pulp.squeezer.rpm_distribution:
+    name: "{{ item.item.base_path | replace('/', '-') }}"
+    base_path: "{{ item.item.base_path }}"
+    publication: "{{ item.publication.pulp_href }}"
+    generate_repo_config: true
+    state: present
+  loop: "{{ pulp_content_repos_pinned.results }}"
+  loop_control:
+    label: "{{ item.item.base_path }}"

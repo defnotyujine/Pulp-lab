@@ -1,0 +1,15 @@
+---
+
+# Runs on the control node and talks to the Pulp API
+# Modules use the pulp-cli venv's Python
+- name: Manage Pulp content repositories
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - ../sysconfig/pulp_content_repos.yml
+  vars:
+    ansible_python_interpreter: "{{ lookup('ansible.builtin.env', 'HOME') }}/.venvs/pulp/bin/python"
+    pulp_content_repos_url: "http://{{ hostvars[groups['pulp_servers'][0]]['ansible_host'] }}:8080"
+  roles:
+    - pulp_content_repos

@@ -1,5 +1,12 @@
 ---
 
+# Red Hat CDN needs this machine's subscription certificates (subscription-manager).
+# The entitlement file name changes when the certificate is rotated, update it here only.
+pulp_content_repos_rhel_cdn: &rhel_cdn
+  ca_cert: /etc/rhsm/ca/redhat-uep.pem
+  client_cert: /etc/pki/entitlement/3329830251275859470.pem
+  client_key: /etc/pki/entitlement/3329830251275859470-key.pem
+
 # RPM repositories managed in Pulp
 # Each channel is a distribution. Without "version" it follows every sync,
 # with "version" it stays on that repository version (bump it to promote).
@@ -11,3 +18,42 @@ pulp_content_repos_rpm:
       - base_path: wazuh/4/latest
       - base_path: wazuh/4/approved
         version: 1
+
+  # RHEL 10
+  - name: rhel10-baseos
+    url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/os
+    <<: *rhel_cdn
+    channels:
+      - base_path: rhel/10/baseos/latest
+
+  - name: rhel10-appstream
+    url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/os
+    <<: *rhel_cdn
+    channels:
+      - base_path: rhel/10/appstream/latest
+
+  # RHEL 9
+  - name: rhel9-baseos
+    url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os
+    <<: *rhel_cdn
+    channels:
+      - base_path: rhel/9/baseos/latest
+
+  - name: rhel9-appstream
+    url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os
+    <<: *rhel_cdn
+    channels:
+      - base_path: rhel/9/appstream/latest
+
+  # RHEL 8
+  - name: rhel8-baseos
+    url: https://cdn.redhat.com/content/dist/rhel8/8/x86_64/baseos/os
+    <<: *rhel_cdn
+    channels:
+      - base_path: rhel/8/baseos/latest
+
+  - name: rhel8-appstream
+    url: https://cdn.redhat.com/content/dist/rhel8/8/x86_64/appstream/os
+    <<: *rhel_cdn
+    channels:
+      - base_path: rhel/8/appstream/latest

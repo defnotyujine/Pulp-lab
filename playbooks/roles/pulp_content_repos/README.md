@@ -39,6 +39,7 @@ Each entry:
 | `policy` | | `on_demand` | `immediate`, `on_demand` or `streamed`. |
 | `sync_policy` | | `additive` | `additive`, `mirror_content_only` or `mirror_complete`. |
 | `retain_package_versions` | | | Keep only the newest N versions of each package. |
+| `ca_cert` / `client_cert` / `client_key` | | | Paths on the control node to TLS files for the remote, e.g. Red Hat CDN subscription certificates. Read by the role and stored by Pulp. |
 | `channels` | ✓ | | List of `base_path` (and optional `version`). Without `version` the channel follows every sync. |
 
 ---

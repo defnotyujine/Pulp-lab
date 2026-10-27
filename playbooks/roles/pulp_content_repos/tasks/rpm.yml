@@ -1,11 +1,41 @@
 ---
 
+# Only for repos with certificates (e.g. Red Hat CDN), see the next task.
+- name: Look up the existing RPM remote {{ pulp_content_repos_repo.name }}
+  pulp.squeezer.rpm_remote:
+    name: "{{ pulp_content_repos_repo.name }}"
+  register: pulp_content_repos_existing_remote
+  failed_when: false
+  when: pulp_content_repos_repo.client_key is defined
+
+# Pulp never returns the client key, so it is only sent when the remote is new
+# or its certificate changed. Otherwise every run would report changed.
 - name: Create RPM remote {{ pulp_content_repos_repo.name }}
   pulp.squeezer.rpm_remote:
     name: "{{ pulp_content_repos_repo.name }}"
     url: "{{ pulp_content_repos_repo.url }}"
     policy: "{{ pulp_content_repos_repo.policy | default('on_demand') }}"
+    ca_cert: "{{ pulp_content_repos_ca_cert or omit }}"
+    client_cert: "{{ pulp_content_repos_client_cert or omit }}"
+    client_key: "{{ pulp_content_repos_client_key if pulp_content_repos_send_key | bool else omit }}"
     state: present
+  vars:
+    # Sent exactly as Pulp stores them, so re-runs compare equal: the CA file with its
+    # final newline, and only the certificate block of the entitlement file.
+    pulp_content_repos_ca_cert: >-
+      {{ lookup('ansible.builtin.file', pulp_content_repos_repo.ca_cert, rstrip=false)
+         if pulp_content_repos_repo.ca_cert is defined else '' }}
+    pulp_content_repos_client_cert: >-
+      {{ lookup('ansible.builtin.file', pulp_content_repos_repo.client_cert)
+         | regex_search('-----BEGIN CERTIFICATE-----[^-]+-----END CERTIFICATE-----[^-]')
+         if pulp_content_repos_repo.client_cert is defined else '' }}
+    pulp_content_repos_client_key: >-
+      {{ lookup('ansible.builtin.file', pulp_content_repos_repo.client_key)
+         if pulp_content_repos_repo.client_key is defined else '' }}
+    pulp_content_repos_send_key: >-
+      {{ pulp_content_repos_repo.client_key is defined and
+         (pulp_content_repos_existing_remote.remote is not defined or
+          pulp_content_repos_existing_remote.remote.client_cert != pulp_content_repos_client_cert) }}
 
 # autopublish creates the yum metadata for every new version.
 - name: Create RPM repository {{ pulp_content_repos_repo.name }}

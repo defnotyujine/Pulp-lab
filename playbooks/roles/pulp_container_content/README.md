@@ -1,38 +1,73 @@
-Role Name
-=========
+# Pulp Container Content Role
 
-A brief description of the role goes here.
+This role mirrors container images into Pulp from a YAML list, so Pulp serves them as a container registry. For each image it creates the remote with the tags to sync, the repository, syncs it, and creates its distributions: channels that follow the latest version, and channels pinned to a specific repository version. Bumping a pinned channel's `version` and re-running promotes it, lowering it rolls back.
 
-Requirements
-------------
+It runs on the control node against the Pulp API using `pulp.squeezer`.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+---
 
-Role Variables
---------------
+## Requirements
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- A running Pulp server (see the `pulp_setup` role), which ships the container plugin and the `/v2/` registry API
+- `pulp.squeezer` 0.4.0 (`ansible-galaxy collection install -r requirements.yml`)
+- `pulp-glue` >=0.29.2,<0.40 in the Python that runs the modules (the playbook uses the `~/.venvs/pulp` venv)
 
-Dependencies
-------------
+---
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Role Variables
 
-Example Playbook
-----------------
+### Connection
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `pulp_container_content_url` | string | `"http://localhost:8080"` | Pulp API URL. The playbook sets it from the inventory. |
+| `pulp_container_content_username` | string | `"admin"` | Pulp user. |
+| `pulp_container_content_password` | string | `"changeme"` | Pulp password. Lab value. |
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+### Images
 
-License
--------
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `pulp_container_content_images` | list | `[]` | Container images to manage. See below. |
 
-BSD
+Each entry:
 
-Author Information
-------------------
+| Key | Required | Default | Description |
+|---|---|---|---|
+| `name` | ✓ | | Name of the remote and repository. |
+| `url` | ✓ | | Upstream registry, e.g. `https://registry.access.redhat.com`. |
+| `upstream_name` | ✓ | | Image path on the registry, e.g. `ubi9/ubi-minimal`. |
+| `include_tags` | ✓ | | Tags to sync. Wildcards like `9.*` work. |
+| `policy` | | `on_demand` | `on_demand` downloads layers on the first pull (upstream must be reachable then), `immediate` downloads every layer and architecture at sync. |
+| `channels` | ✓ | | List of `base_path` (and optional `version` and `private`). Without `version` the channel follows every sync. `private: true` requires a login to pull. |
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+---
+
+## Example
+
+```yaml
+pulp_container_content_images:
+  - name: ubi9-minimal
+    url: https://registry.access.redhat.com
+    upstream_name: ubi9/ubi-minimal
+    include_tags:
+      - latest
+    channels:
+      - base_path: containers/ubi9-minimal/latest
+      - base_path: containers/ubi9-minimal/approved
+        version: 1
+```
+
+Clients pull `<pulp>:8080/<base_path>:<tag>`. The registry is plain HTTP in the lab, so Podman needs `--tls-verify=false` or the registry marked insecure in `/etc/containers/registries.conf`:
+
+```
+podman pull --tls-verify=false <pulp>:8080/containers/ubi9-minimal/approved:latest
+```
+
+Images built in house don't need this role: `podman login` to Pulp and `podman push <pulp>:8080/<name>:<tag>` creates a push repository on the first push.
+
+---
+
+## Maintainer Information
+
+* Eugene Garces

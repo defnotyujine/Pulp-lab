@@ -1,2 +1,9 @@
 ---
-# defaults file for pulp_container_content
+
+# Pulp API connection
+pulp_container_content_url: "http://localhost:8080"     # set by the playbook from the inventory
+pulp_container_content_username: "admin"
+pulp_container_content_password: "changeme"             # lab value, same as pulp_setup_admin_password
+
+# Container images to manage, set in playbooks/vars/pulp_container_content.yml
+pulp_container_content_images: []

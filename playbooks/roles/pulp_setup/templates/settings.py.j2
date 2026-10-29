@@ -3,6 +3,8 @@
 # as /etc/pulp/settings.py. Sets the client URL, PostgreSQL and Redis.
 SECRET_KEY = {{ pulp_setup_secret_key | to_json }}
 CONTENT_ORIGIN = {{ pulp_setup_url | to_json }}
+# Galaxy API download links (pulp_ansible), defaults to the container hostname.
+ANSIBLE_API_HOSTNAME = {{ pulp_setup_url | to_json }}
 
 DATABASES = {
     "default": {

@@ -1,17 +1,41 @@
 ---
 
 # Ansible collection repositories mirrored from Galaxy
-# Only the listed collections (plus their dependencies) are synced.
 # Each channel is a distribution. Without "version" it follows every sync,
 # with "version" it stays on that repository version (bump it to promote).
 pulp_ansible_content_collections:
   - name: galaxy
     url: https://galaxy.ansible.com/api/
+    # Dependencies are listed below instead, Galaxy dependency ranges like "*" would
+    # pull every version ever released (e.g. 240+ of community.general).
+    sync_dependencies: false
     requirements:
       - name: ansible.posix
         version: ">=2.0.0,<3.0.0"
+      - name: ansible.windows
+        version: ">=3.0.0,<4.0.0"
       - name: community.general
         version: ">=13.0.0,<14.0.0"
+      - name: community.libvirt
+        version: ">=2.0.0,<3.0.0"
+      - name: community.zabbix
+        version: ">=4.0.0,<5.0.0"
+      - name: pulp.squeezer
+        version: ">=0.4.0,<0.5.0"
+
+      # Dependencies of the collections above
+      - name: ansible.mysql                                 # community.mysql
+        version: ">=5.0.0,<6.0.0"
+      - name: ansible.netcommon                             # community.zabbix
+        version: ">=8.0.0,<9.0.0"
+      - name: ansible.utils                                 # ansible.netcommon
+        version: ">=6.0.0,<7.0.0"
+      - name: community.library_inventory_filtering_v1      # community.general
+        version: ">=1.0.0,<2.0.0"
+      - name: community.mysql                               # community.zabbix
+        version: ">=5.0.0,<6.0.0"
+      - name: community.postgresql                          # community.zabbix
+        version: ">=5.0.0,<6.0.0"
     channels:
       - base_path: collections/latest
       - base_path: collections/approved

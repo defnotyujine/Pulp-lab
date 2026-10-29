@@ -36,7 +36,8 @@ Each entry:
 |---|---|---|---|
 | `name` | ✓ | | Name of the remote and repository. |
 | `url` | ✓ | | Galaxy API URL, e.g. `https://galaxy.ansible.com/api/`. |
-| `requirements` | ✓ | | Collections to sync: `name` and optional `version` range. Dependencies are synced too. |
+| `requirements` | ✓ | | Collections to sync: `name` and optional `version` range. |
+| `sync_dependencies` | | `true` | Also sync each collection's dependencies. Set to `false` and list them in `requirements` to keep their versions in range. |
 | `channels` | ✓ | | List of `base_path` (and optional `version`). Without `version` the channel follows every sync. |
 
 ---

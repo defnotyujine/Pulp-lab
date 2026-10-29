@@ -1,12 +1,14 @@
 ---
 
-# Only the listed collections (and their dependencies) are synced, not all of Galaxy.
+# Only the listed collections (and their dependencies, unless sync_dependencies is false)
+# are synced, not all of Galaxy.
 # Each requirement goes into the remote's requirements file as a YAML (JSON) mapping.
 - name: Create collection remote {{ pulp_ansible_content_repo.name }}
   pulp.squeezer.ansible_remote:
     name: "{{ pulp_ansible_content_repo.name }}"
     url: "{{ pulp_ansible_content_repo.url }}"
     collections: "{{ pulp_ansible_content_repo.requirements | map('to_json') | list }}"
+    sync_dependencies: "{{ pulp_ansible_content_repo.sync_dependencies | default(omit) }}"
     state: present
 
 - name: Create collection repository {{ pulp_ansible_content_repo.name }}

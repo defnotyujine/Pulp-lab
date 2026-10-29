@@ -1,0 +1,37 @@
+---
+
+# on_demand: the sync only fetches manifests, layers are downloaded on the first pull.
+# Only the listed tags are synced, an image can have hundreds.
+- name: Create container remote {{ pulp_container_content_image.name }}
+  pulp.squeezer.container_remote:
+    name: "{{ pulp_container_content_image.name }}"
+    url: "{{ pulp_container_content_image.url }}"
+    upstream_name: "{{ pulp_container_content_image.upstream_name }}"
+    include_tags: "{{ pulp_container_content_image.include_tags }}"
+    policy: "{{ pulp_container_content_image.policy | default('on_demand') }}"
+    state: present
+
+- name: Create container repository {{ pulp_container_content_image.name }}
+  pulp.squeezer.container_repository:
+    name: "{{ pulp_container_content_image.name }}"
+    state: present
+
+# Only reports changed when upstream changed and a new version was created.
+- name: Sync container repository {{ pulp_container_content_image.name }}
+  pulp.squeezer.container_sync:
+    repository: "{{ pulp_container_content_image.name }}"
+    remote: "{{ pulp_container_content_image.name }}"
+
+# Each channel is pulled as <pulp>:8080/<base_path>:<tag>. Without "version" it
+# follows every sync, changing it and re-running is promotion (or rollback).
+- name: Distribute the channels {{ pulp_container_content_image.name }}
+  pulp.squeezer.container_distribution:
+    name: "{{ item.base_path | replace('/', '-') }}"
+    base_path: "{{ item.base_path }}"
+    repository: "{{ pulp_container_content_image.name }}"
+    version: "{{ item.version | default(omit) }}"
+    private: "{{ item.private | default(omit) }}"
+    state: present
+  loop: "{{ pulp_container_content_image.channels }}"
+  loop_control:
+    label: "{{ item.base_path }}"

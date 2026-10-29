@@ -1,0 +1,53 @@
+---
+
+# Container images mirrored from upstream registries
+# Each channel is a distribution. Without "version" it follows every sync,
+# with "version" it stays on that repository version (bump it to promote).
+pulp_container_content_images:
+  # UBI minimal, one image per major version on the Red Hat registry
+  - name: ubi8-minimal
+    url: https://registry.access.redhat.com
+    upstream_name: ubi8/ubi-minimal
+    include_tags:
+      - "8.10"
+      - latest
+    channels:
+      - base_path: containers/ubi8-minimal/latest
+      - base_path: containers/ubi8-minimal/approved
+        version: 1
+
+  - name: ubi9-minimal
+    url: https://registry.access.redhat.com
+    upstream_name: ubi9/ubi-minimal
+    include_tags:
+      - "9.8"
+      - latest
+    # policy: immediate                       # download all layers at sync, for images that must work without upstream
+    channels:
+      - base_path: containers/ubi9-minimal/latest
+      - base_path: containers/ubi9-minimal/approved
+        version: 1
+
+  - name: ubi10-minimal
+    url: https://registry.access.redhat.com
+    upstream_name: ubi10/ubi-minimal
+    include_tags:
+      - "10.2"
+      - latest
+    channels:
+      - base_path: containers/ubi10-minimal/latest
+      - base_path: containers/ubi10-minimal/approved
+        version: 1
+
+  # AlmaLinux, one image with a tag per major version (pull almalinux:9 etc.)
+  - name: almalinux
+    url: https://quay.io
+    upstream_name: almalinuxorg/almalinux
+    include_tags:
+      - "8"
+      - "9"
+      - "10"
+    channels:
+      - base_path: containers/almalinux/latest
+      - base_path: containers/almalinux/approved
+        version: 1

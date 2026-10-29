@@ -9,11 +9,13 @@
   vars_files:
     - vars/pulp_content_repos.yml
     - vars/pulp_ansible_content.yml
+    - vars/pulp_container_content.yml
   vars:
     ansible_python_interpreter: "{{ lookup('ansible.builtin.env', 'HOME') }}/.venvs/pulp/bin/python"
     pulp_content_url: "http://{{ hostvars[groups['pulp_servers'][0]]['ansible_host'] }}:8080"
     pulp_content_repos_url: "{{ pulp_content_url }}"
     pulp_ansible_content_url: "{{ pulp_content_url }}"
+    pulp_container_content_url: "{{ pulp_content_url }}"
   tasks:
     - name: Import Pulp Content Repos Role
       ansible.builtin.include_role:
@@ -28,3 +30,10 @@
         apply:
           tags: pulp_ansible_content
       tags: pulp_ansible_content
+
+    - name: Import Pulp Container Content Role
+      ansible.builtin.include_role:
+        name: pulp_container_content
+        apply:
+          tags: pulp_container_content
+      tags: pulp_container_content

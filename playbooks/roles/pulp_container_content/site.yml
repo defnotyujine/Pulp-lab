@@ -1,0 +1,8 @@
+---
+
+- name: Manage Pulp container content
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - role: "{{ playbook_dir }}"

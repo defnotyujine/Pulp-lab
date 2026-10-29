@@ -1,0 +1,24 @@
+---
+
+- name: Manage container content through the Pulp API
+  module_defaults:
+    group/pulp.squeezer.squeezer:
+      pulp_url: "{{ pulp_container_content_url }}"
+      username: "{{ pulp_container_content_username }}"
+      password: "{{ pulp_container_content_password }}"
+  block:
+    - name: Run Preliminaries and Data Validation
+      ansible.builtin.import_tasks:
+        file: prelim.yml
+      tags: always
+
+    - name: Configure container images
+      ansible.builtin.include_tasks:
+        file: images.yml
+        apply:
+          tags: pulp_container_images
+      loop: "{{ pulp_container_content_images }}"
+      loop_control:
+        loop_var: pulp_container_content_image
+        label: "{{ pulp_container_content_image.name }}"
+      tags: pulp_container_images

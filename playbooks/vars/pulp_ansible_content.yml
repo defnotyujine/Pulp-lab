@@ -1,0 +1,18 @@
+---
+
+# Ansible collection repositories mirrored from Galaxy
+# Only the listed collections (plus their dependencies) are synced.
+# Each channel is a distribution. Without "version" it follows every sync,
+# with "version" it stays on that repository version (bump it to promote).
+pulp_ansible_content_collections:
+  - name: galaxy
+    url: https://galaxy.ansible.com/api/
+    requirements:
+      - name: ansible.posix
+        version: ">=2.0.0,<3.0.0"
+      - name: community.general
+        version: ">=13.0.0,<14.0.0"
+    channels:
+      - base_path: collections/latest
+      - base_path: collections/approved
+        version: 1

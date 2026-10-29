@@ -5,5 +5,5 @@ pulp_content_repos_url: "http://localhost:8080"     # set by the playbook from t
 pulp_content_repos_username: "admin"
 pulp_content_repos_password: "changeme"             # lab value, same as pulp_setup_admin_password
 
-# RPM repositories to manage, set in sysconfig/pulp_content_repos.yml
+# RPM repositories to manage, set in playbooks/vars/pulp_content_repos.yml
 pulp_content_repos_rpm: []

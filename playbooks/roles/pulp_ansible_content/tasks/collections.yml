@@ -1,0 +1,34 @@
+---
+
+# Only the listed collections (and their dependencies) are synced, not all of Galaxy.
+# Each requirement goes into the remote's requirements file as a YAML (JSON) mapping.
+- name: Create collection remote {{ pulp_ansible_content_repo.name }}
+  pulp.squeezer.ansible_remote:
+    name: "{{ pulp_ansible_content_repo.name }}"
+    url: "{{ pulp_ansible_content_repo.url }}"
+    collections: "{{ pulp_ansible_content_repo.requirements | map('to_json') | list }}"
+    state: present
+
+- name: Create collection repository {{ pulp_ansible_content_repo.name }}
+  pulp.squeezer.ansible_repository:
+    name: "{{ pulp_ansible_content_repo.name }}"
+    state: present
+
+# Only reports changed when Galaxy has new matching versions and a new version was created.
+- name: Sync collection repository {{ pulp_ansible_content_repo.name }}
+  pulp.squeezer.ansible_sync:
+    repository: "{{ pulp_ansible_content_repo.name }}"
+    remote: "{{ pulp_ansible_content_repo.name }}"
+
+# Without "version" the channel follows every sync. Changing it and re-running is
+# promotion (or rollback).
+- name: Distribute the channels {{ pulp_ansible_content_repo.name }}
+  pulp.squeezer.ansible_distribution:
+    name: "{{ item.base_path | replace('/', '-') }}"
+    base_path: "{{ item.base_path }}"
+    repository: "{{ pulp_ansible_content_repo.name }}"
+    version: "{{ item.version | default(omit) }}"
+    state: present
+  loop: "{{ pulp_ansible_content_repo.channels }}"
+  loop_control:
+    label: "{{ item.base_path }}"

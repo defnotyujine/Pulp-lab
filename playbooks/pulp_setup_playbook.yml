@@ -27,5 +27,10 @@
 - name: Deploy the Pulp server
   hosts: pulp_servers
   become: true
-  roles:
-    - pulp_setup
+  tasks:
+    - name: Import Pulp Setup Role
+      ansible.builtin.include_role:
+        name: pulp_setup
+        apply:
+          tags: pulp_setup
+      tags: pulp_setup

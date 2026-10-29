@@ -1,0 +1,4 @@
+---
+
+- name: Check the Pulp API is reachable
+  pulp.squeezer.status:

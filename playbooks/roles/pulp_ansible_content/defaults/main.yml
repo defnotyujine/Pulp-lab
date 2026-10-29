@@ -1,0 +1,9 @@
+---
+
+# Pulp API connection
+pulp_ansible_content_url: "http://localhost:8080"     # set by the playbook from the inventory
+pulp_ansible_content_username: "admin"
+pulp_ansible_content_password: "changeme"             # lab value, same as pulp_setup_admin_password
+
+# Collection repositories to manage, set in sysconfig/pulp_ansible_content.yml
+pulp_ansible_content_collections: []

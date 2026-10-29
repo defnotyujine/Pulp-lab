@@ -1,0 +1,24 @@
+---
+
+- name: Manage Ansible content through the Pulp API
+  module_defaults:
+    group/pulp.squeezer.squeezer:
+      pulp_url: "{{ pulp_ansible_content_url }}"
+      username: "{{ pulp_ansible_content_username }}"
+      password: "{{ pulp_ansible_content_password }}"
+  block:
+    - name: Run Preliminaries and Data Validation
+      ansible.builtin.import_tasks:
+        file: prelim.yml
+      tags: always
+
+    - name: Configure collection repositories
+      ansible.builtin.include_tasks:
+        file: collections.yml
+        apply:
+          tags: pulp_ansible_collections
+      loop: "{{ pulp_ansible_content_collections }}"
+      loop_control:
+        loop_var: pulp_ansible_content_repo
+        label: "{{ pulp_ansible_content_repo.name }}"
+      tags: pulp_ansible_collections
